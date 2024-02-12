@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Sentiments</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+        crossorigin="anonymous">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+        integrity="sha384-GLhlTQ8iNl7lSwC9S6t8ETzoIIVJGJjDQ17zfmKbBRZgM5z9z1BKGs2S9Z6uUz" crossorigin="anonymous">
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-image: url('static/5.jpg');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            color: #fff;
+        }
+
+        .navbar {
+            background-color: #343a40 !important;
+        }
+
+        .navbar-dark .navbar-brand {
+            color: #fff;
+        }
+
+        .navbar-dark .navbar-toggler-icon {
+            background-color: #fff;
+        }
+
+        h1 {
+            color: antiquewhite;
+            font-size: 86px;
+            font-variant: petite-caps;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        .product-info {
+            text-align: center;
+            width: 65%;
+            margin: 0 auto;
+            border-radius: 2.25rem;
+            margin-bottom: 30px;
+            background-color: rgba(255, 255, 255, 0.3);
+            padding: 15px;
+        }
+
+        .review-header {
+            text-align: center;
+            width: 77%;
+            margin: 0 auto;
+            background-color: antiquewhite;
+            font-size: 29px;
+            border-radius: 1.25rem;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        .review-stats {
+            text-align: center;
+            width: 57%;
+            margin: 0 auto;
+            border-radius: 2.25rem;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        .positive-reviews {
+            padding: 5px;
+            border-radius: 1.25rem;
+            width: 50%;
+            background-color: palegreen;
+            font-weight: bold;
+            margin: 0 auto;
+            margin-bottom: 15px;
+        }
+
+        .negative-reviews {
+            padding: 5px;
+            width: 50%;
+            background-color: indianred;
+            font-weight: bold;
+            margin: 0 auto;
+            border-radius: 1.25rem;
+        }
+
+        .card {
+            margin: 20px auto;
+            border-radius: 2.25rem;
+            transition: 0.5s ease;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .positive-card {
+            background-color: palegreen;
+        }
+
+        .negative-card {
+            background-color: indianred;
+        }
+
+        .card-text {
+            font-size: 18px;
+        }
+
+        .fa-star {
+            color: orange;
+        }
+
+        footer {
+            background-color: #343a40;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="/">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/wc" target="_blank">Wordcloud</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <h1><b>Review Sentiments</b></h1>
+
+    <div class='product-info'>
+        <p><b>Product Name:</b> {{ proname }}</p>
+        <p><b>Price:</b> {{ price }}</p>
+    </div>
+
+    <div class="review-header">
+        <b>Now based on the below top {{ n }} reviews of the product on Flipkart decide whether you want to purchase
+            the product or not!!!</b>
+    </div>
+
+    <div class='row review-stats'>
+        <div class='col-md-6'>
+            <p class='positive-reviews'>POSITIVE REVIEWS -->{{np}}/{{n}}</p>
+        </div>
+        <div class='col-md-6'>
+            <p class='negative-reviews'>NEGATIVE REVIEWS --> {{nn}}/{{n}}</p>
+        </div>
+    </div>
+
+    {% for obj in dic %}
+    <div class="card my-5 {% if obj['sent'] == 'POSITIVE' %}positive-card{% else %}negative-card{% endif %}"
+        style="max-width: 1000px;">
+        <div class="row" style='align-items:center'>
+            <div class="col-md-12">
+                <div class="card-body">
+                    <p style="font-size:22px;"><b> {{obj['ch']}} </b></p>
+                    <p class="card-text">{{ obj['review'] }} </p>
+                    <p style="font-size:14px;text-align: end;"><i> {{obj['cn']}} </i></p>
+                    <div>
+                        {% if obj['stars'] == 0 %}
+                        <p> No rating Given </p>
+                        {% else %}
+                        {% for it in range(obj['stars']) %}
+                        <span class="fa fa-star"></span>
+                        {% endfor %}
+                        {% for it in range(5-obj['stars']) %}
+                        <span class="fa fa-star"></span>
+                        {% endfor %}
+                        {% endif %}
+                   </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Purchase Recommendation Section -->
+    <div class="review-header mt-5">
+        <b>Purchase Recommendation:</b>
+    </div>
+    <div class="purchase-recommendation">
+        <h2>{{ recommendation }}</h2>
+    </div>
+
+    <footer>
+        <p class='text-center py-1 my-0'>Made with ❤ by Ankit Kanyal</p>
+    </footer>
+
+    <!-- Bootstrap and Popper.js JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

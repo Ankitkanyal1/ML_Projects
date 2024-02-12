@@ -1,0 +1,59 @@
+import re
+import nltk
+import joblib
+import numpy as np
+from bs4 import BeautifulSoup
+import urllib.request as urllib
+from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
+
+# Download NLTK resources
+nltk.download('punkt')
+nltk.download('stopwords')
+
+# Function to clean and preprocess text
+def clean_text(text):
+    text = re.sub(r'[^a-zA-Z]', ' ', text)
+    text = text.lower()
+    text = nltk.word_tokenize(text)
+    text = [word for word in text if word not in set(stopwords.words('english'))]
+    text = ' '.join(text)
+    return text
+
+# Load your dataset or provide your own dataset
+# For example, you can load a CSV file with two columns: 'text' and 'label' (0 or 1 for negative and positive)
+# df = pd.read_csv('your_dataset.csv')
+
+# For this example, let's assume you have a list 'reviews' and 'labels'
+reviews = ["This is a positive review.", "Negative experience with the product.", ...]
+labels = [1, 0, ...]
+
+# Clean and preprocess the text
+clean_reviews = [clean_text(review) for review in reviews]
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(clean_reviews, labels, test_size=0.2, random_state=42)
+
+# Convert text data to TF-IDF vectors
+vectorizer = TfidfVectorizer(max_features=5000)
+X_train_tfidf = vectorizer.fit_transform(X_train)
+X_test_tfidf = vectorizer.transform(X_test)
+
+# Train SVM model
+svm_model = SVC(kernel='linear')
+svm_model.fit(X_train_tfidf, y_train)
+
+# Make predictions on the test set
+y_pred = svm_model.predict(X_test_tfidf)
+
+# Calculate accuracy
+accuracy = accuracy_score(y_test, y_pred)
+print("SVM Accuracy:", accuracy)
+
+# Save the model
+joblib.dump(svm_model, 'svm_model.sav')
+
+# Now, you can use this trained model for sentiment analysis in your Flask application.
